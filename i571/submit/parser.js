@@ -59,12 +59,12 @@ class Parser {
     rec_op.push(this.tok.lexeme);
     this.consume("TYPE");
     this.consume(";");
-    if(this.tok.kind != "END"){
+    if(this.tok.kind != "END" && this.tok.kind != EOF){
       this.record();
     }
     this.consume("END");
     this.consume(";");
-    o_p.push(rec_op);
+    return rec_op;
 
   }
   decl() {
@@ -75,11 +75,14 @@ class Parser {
     this.consume(":");
     if (this.tok.kind == "RECORD") {
       // == ===
-      record();
-    }
+      this.consume("RECORD");
+      let rec_op = this.record();
+      o_p.push(rec_op);
+    }else{
     o_p.push(this.tok.lexeme);
-    this.consume("TYPE");
-    this.consume(";");
+    //this.consume("TYPE");
+    }
+    //this.consume(";");
     console.log(o_p);
   }
   
@@ -93,14 +96,14 @@ function scan(str) {
   for (let s = str; s.length > 0; s = s.slice(m[0].length)) {
     
     if (m = s.match(/^[#]/)) {  //any single char
-      if(s.match(/^[\n]/g)){
-        continue;
-      }
+      // if(s.match(/^[\n]/g)){
+      //   continue;
+      // }
       let sp = s.split(/^r?\n|\r|\n/);
       sp.shift();
       s = sp.join("")
     }
-    else if (m = s.match(/^[ \t]+/)) { //s starts with linear whitespace
+    else if (m = s.match(/^[ \t\n]+/)) { //s starts with linear whitespace
       continue; //skip linear whitespace
     }
     else if (m = s.match(/\b^var?\b/)) { //to match just var
@@ -134,7 +137,7 @@ function scan(str) {
   //console.log(toks);
   
 
-  console.log(toks);
+ // console.log(toks);
   return toks;
 }
 
@@ -143,7 +146,7 @@ class Token {
     Object.assign(this, {kind, lexeme});
   }
 }
-expr = "var personPosition : record \n x : number; #hvjvjhcg;"
+expr = "var personPosition : record \n x : number; end;#hvjvjhcg;"
 let tokens = scan(expr)
 
 let parser = new Parser(tokens)
