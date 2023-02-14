@@ -52,20 +52,27 @@ class Parser {
   //      : ;
   //      | decl
   record() {
-    let rec_op = [];
-    rec_op.push(this.tok.lexeme);
-    this.consume("IDENTIFIER");
-    this.consume(":");
-    rec_op.push(this.tok.lexeme);
-    this.consume("TYPE");
-    this.consume(";");
-    if(this.tok.kind != "END" && this.tok.kind != EOF){
-      this.record();
-    }
-    this.consume("END");
-    this.consume(";");
-    return rec_op;
+    let g_arr=[];
+    while(this.tok.kind != "END"){
+      let rec_op = [];
+      rec_op.push(this.tok.lexeme);
+      this.consume("IDENTIFIER");
+      this.consume(":");
+      if(this.tok.kind == "RECORD"){
+        this.consume("RECORD");
+        rec_op.push(this.record());
+      }
+       else if(this.tok.kind == "TYPE"){
+        rec_op.push(this.tok.lexeme);
+        this.consume("TYPE");
+        this.consume(";");
+      }
+      g_arr.push(rec_op);
 
+    }
+    this.consume("END")
+    this.consume(";");
+    return g_arr;
   }
   decl() {
     let o_p = [];
@@ -80,10 +87,15 @@ class Parser {
       o_p.push(rec_op);
     }else{
     o_p.push(this.tok.lexeme);
-    //this.consume("TYPE");
+    if(this.tok.kind == "END"){
+      this.consume("END");
+    }
+    else if(this.tok.kind == "TYPE"){
+      this.consume("TYPE");
+    }
     }
     //this.consume(";");
-    console.log(o_p);
+    console.log(JSON.stringify(o_p));
   }
   
 }
@@ -95,15 +107,16 @@ function scan(str) {
   let m;
   for (let s = str; s.length > 0; s = s.slice(m[0].length)) {
     
-    if (m = s.match(/^[#]/)) {  //any single char
+    if (m = s.match(/^#/)) {  //any comment
       // if(s.match(/^[\n]/g)){
       //   continue;
       // }
       let sp = s.split(/^r?\n|\r|\n/);
       sp.shift();
-      s = sp.join("")
+      s = sp.join("\n")
+      console.log(s);
     }
-    else if (m = s.match(/^[ \t\n]+/)) { //s starts with linear whitespace
+    else if (m = s.match(/^[ \t\n\r]+/)) { //s starts with linear whitespace
       continue; //skip linear whitespace
     }
     else if (m = s.match(/\b^var?\b/)) { //to match just var
@@ -127,9 +140,6 @@ function scan(str) {
     else if (m = s.match(/^[:,;?]/)) {  //symbols
       toks.push(new Token(m[0], m[0]));
     }
-    else if (m = s.match(/^[\n]+/)) {  //symbols
-      continue;
-    }
     
     
 
@@ -137,7 +147,7 @@ function scan(str) {
   //console.log(toks);
   
 
- // console.log(toks);
+ console.log(toks);
   return toks;
 }
 
@@ -146,15 +156,11 @@ class Token {
     Object.assign(this, {kind, lexeme});
   }
 }
-expr = "var personPosition : record \n x : number; end;#hvjvjhcg;"
-let tokens = scan(expr)
+expr = "var personPosition : record\nname: record\n firstName: string;\n lastName: string;\nend;\nposition: record\n x: number;\n y: number;\n z: number;\n end;\nend;"
+const fs = require('fs')
+const fileContents = fs.readFileSync('./input.txt').toString()
+//console.log(fileContents);
+let tokens = scan(fileContents)
 
 let parser = new Parser(tokens)
 parser.parse();
-
-//returns Error object or JSON string
-
-  //wrapper used for crude  error recovery
-
-  //var personPosition : record\nname: record\nfirstName: string;\n  lastName: string;\n end;\n   #position: record\nx: number;\n#y: number; \nz: number;\n   end;\nend;
-  //var personPosition : record\n #x:number;\n end
