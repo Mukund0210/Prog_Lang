@@ -10,10 +10,10 @@ class Parser {
     try {
       let result = this.parseLo();
       if (!this.peek("EOF")) {
+        exit(1)
         const msg = `expecting end-of-input at "${this.tok.lexeme}"`;
         exit(1)
         throw new SyntaxError(msg);
-        exit(1);
       }
       return result;
     } catch (err) {
@@ -58,7 +58,7 @@ class Parser {
   //      | decl
   record() {
     let g_arr=[];
-    while(this.tok.kind != "END"){
+    while(this.tok.kind != "END" && this._index<this._tokens.length){
       let rec_op = [];
       rec_op.push(this.tok.lexeme);
       this.consume("IDENTIFIER");
@@ -68,6 +68,9 @@ class Parser {
         rec_op.push(this.record());
       }
        else if(this.tok.kind == "TYPE"){
+        if(this.tok.kind == "END"){
+          exit(1)
+        }
         rec_op.push(this.tok.lexeme);
         this.consume("TYPE");
         this.consume(";");
@@ -90,6 +93,9 @@ class Parser {
       if (this.tok.kind == "RECORD") {
         // == ===
         this.consume("RECORD");
+        if(this.tok.kind == "END"){
+          exit(1)
+        }
         let rec_op = this.record();
         o_p.push(rec_op);
       }else{
