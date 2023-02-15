@@ -62,6 +62,9 @@ class Parser {
       this.consume(":");
       if(this.tok.kind == "RECORD"){
         this.consume("RECORD");
+        if(this.tok.kind == "END"){
+          this.consume("END");
+        }
         rec_op.push(this.record());
       }
        else if(this.tok.kind == "TYPE"){
