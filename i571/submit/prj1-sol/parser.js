@@ -12,12 +12,10 @@ class Parser {
       if (!this.peek("EOF")) {
         exit(1)
         const msg = `expecting end-of-input at "${this.tok.lexeme}"`;
-        exit(1)
         throw new SyntaxError(msg);
       }
       return result;
     } catch (err) {
-      exit(1);
       return err;
       console.log("error");
     }
@@ -31,10 +29,9 @@ class Parser {
     if (this.peek(kind)) {
       this.tok = this._nextToken();
     } else {
-      const msg = `expecting ${kind} at "${this.tok.lexeme}"`;
       exit(1)
+      const msg = `expecting ${kind} at "${this.tok.lexeme}"`;
       throw new SyntaxError(msg);
-      
     }
   }
 
@@ -68,9 +65,6 @@ class Parser {
         rec_op.push(this.record());
       }
        else if(this.tok.kind == "TYPE"){
-        if(this.tok.kind == "END"){
-          exit(1)
-        }
         rec_op.push(this.tok.lexeme);
         this.consume("TYPE");
         this.consume(";");
@@ -106,24 +100,15 @@ class Parser {
           o_p.push(this.tok.lexeme);
           this.consume("TYPE");
           this.consume(";");
-        }
       }
-        op_fin.push(o_p);
     }
-   
+      op_fin.push(o_p);
+    }
     
+    
+    //this.consume(";");
     
     console.log(JSON.stringify(op_fin));
-    fs.appendFile("out.txt","\n",function(err){
-      if(err){
-        throw err;
-      }
-    })
-    fs.appendFile("out.txt",JSON.stringify(op_fin),function(err){
-      if(err){
-        throw err;
-      }
-    })
   }
   
 }
@@ -139,14 +124,19 @@ function scan(str) {
   let m;
   for (let s = str; s.length > 0; s = s.slice(m[0].length)) {
     
-    if (m = s.match(/^#/)) {  //any comment
+    if (m = s.match(/^#.*/)) {  //any comment
       // if(s.match(/^[\n]/g)){
       //   continue;
       // }
-      let sp = s.split(/^r?\n|\r|\n/);
-      sp.shift();
-      s = sp.join("\n")
+      // let sp = s.split(/^r?\n|\r|\n/);
+      // sp.shift();
+      // if(sp[1].match(/#.*/)){
+      //   sp.shift();
+      // }
+      // s = sp.join("\n")
       //console.log(s);
+      
+      let a = s.substring(m.length,s.length);
     }
     else if (m = s.match(/^[ \t\n\r]+/)) { //s starts with linear whitespace
       continue; //skip linear whitespace
@@ -176,14 +166,10 @@ function scan(str) {
     
 
   }
-  if(toks.length == 0){
-    console.log("[]");
-    exit(1)
-  }
   //console.log(toks);
   
 
- //console.log(toks);
+  //console.log(toks);
   return toks;
 }
 
@@ -192,13 +178,19 @@ class Token {
     Object.assign(this, {kind, lexeme});
   }
 }
-//expr = "var personPosition : record\nname: record\n firstName: string;\n lastName: string;\nend;\nposition: record\n x: number;\n y: number;\n z: number;\n end;\nend;"
+expr = "var personPosition : record\nname: record\n firstName: string;\n lastName: string;\nend;\nposition: record\n x: number;\n y: number;\n z: number;\n end;\nend;"
 const fs = require('fs');
 const { exit } = require('process');
-const fileContents = fs.readFileSync(0,'utf8');
-
+const fileContents = fs.readFileSync(0,'utf8').toString();
 //console.log(fileContents);
 let tokens = scan(fileContents)
-
 let parser = new Parser(tokens)
 parser.parse();
+
+//returns Error object or JSON string
+
+  //wrapper used for crude  error recovery
+
+  //var personPosition : record\nname: record\nfirstName: string;\n  lastName: string;\n end;\n   #position: record\nx: number;\n#y: number; \nz: number;\n   end;\nend;
+  //var personPosition : record\n #x:number;\n end
+  //var personPosition : record\nname: record\n firstName: string;\n lastName: string;\nend;\nposition: record\n x: number;\n y: number;\n z: number;\n end;\nend;
