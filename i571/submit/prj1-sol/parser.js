@@ -11,10 +11,13 @@ class Parser {
       let result = this.parseLo();
       if (!this.peek("EOF")) {
         const msg = `expecting end-of-input at "${this.tok.lexeme}"`;
+        exit(1)
         throw new SyntaxError(msg);
+        exit(1);
       }
       return result;
     } catch (err) {
+      exit(1);
       return err;
       console.log("error");
     }
@@ -29,7 +32,9 @@ class Parser {
       this.tok = this._nextToken();
     } else {
       const msg = `expecting ${kind} at "${this.tok.lexeme}"`;
+      exit(1)
       throw new SyntaxError(msg);
+      
     }
   }
 
@@ -75,27 +80,44 @@ class Parser {
     return g_arr;
   }
   decl() {
-    let o_p = [];
-    this.consume("VARIABLE");
-    o_p.push(this.tok.lexeme);
-    this.consume("IDENTIFIER");
-    this.consume(":");
-    if (this.tok.kind == "RECORD") {
-      // == ===
-      this.consume("RECORD");
-      let rec_op = this.record();
-      o_p.push(rec_op);
-    }else{
-    o_p.push(this.tok.lexeme);
-    if(this.tok.kind == "END"){
-      this.consume("END");
+    let op_fin = [];
+    while(this.tok.kind == "VARIABLE"){
+      let o_p = [];
+      this.consume("VARIABLE");
+      o_p.push(this.tok.lexeme);
+      this.consume("IDENTIFIER");
+      this.consume(":");
+      if (this.tok.kind == "RECORD") {
+        // == ===
+        this.consume("RECORD");
+        let rec_op = this.record();
+        o_p.push(rec_op);
+      }else{
+        if(this.tok.kind == "END"){
+          this.consume("END");
+        }
+        else if(this.tok.kind == "TYPE"){
+          o_p.push(this.tok.lexeme);
+          this.consume("TYPE");
+          this.consume(";");
+        }
+      }
+        op_fin.push(o_p);
     }
-    else if(this.tok.kind == "TYPE"){
-      this.consume("TYPE");
-    }
-    }
-    //this.consume(";");
-    console.log(JSON.stringify(o_p));
+   
+    
+    
+    console.log(JSON.stringify(op_fin));
+    fs.appendFile("out.txt","\n",function(err){
+      if(err){
+        throw err;
+      }
+    })
+    fs.appendFile("out.txt",JSON.stringify(op_fin),function(err){
+      if(err){
+        throw err;
+      }
+    })
   }
   
 }
@@ -103,6 +125,10 @@ class Parser {
  //Parser
 
 function scan(str) {
+  if(str.length == 0){
+    console.log("[]");
+    exit(1)
+  }
   const toks = [];
   let m;
   for (let s = str; s.length > 0; s = s.slice(m[0].length)) {
@@ -114,7 +140,7 @@ function scan(str) {
       let sp = s.split(/^r?\n|\r|\n/);
       sp.shift();
       s = sp.join("\n")
-      console.log(s);
+      //console.log(s);
     }
     else if (m = s.match(/^[ \t\n\r]+/)) { //s starts with linear whitespace
       continue; //skip linear whitespace
@@ -144,10 +170,14 @@ function scan(str) {
     
 
   }
+  if(toks.length == 0){
+    console.log("[]");
+    exit(1)
+  }
   //console.log(toks);
   
 
- console.log(toks);
+ //console.log(toks);
   return toks;
 }
 
@@ -156,9 +186,11 @@ class Token {
     Object.assign(this, {kind, lexeme});
   }
 }
-expr = "var personPosition : record\nname: record\n firstName: string;\n lastName: string;\nend;\nposition: record\n x: number;\n y: number;\n z: number;\n end;\nend;"
-const fs = require('fs')
-const fileContents = fs.readFileSync('./input.txt').toString()
+//expr = "var personPosition : record\nname: record\n firstName: string;\n lastName: string;\nend;\nposition: record\n x: number;\n y: number;\n z: number;\n end;\nend;"
+const fs = require('fs');
+const { exit } = require('process');
+const fileContents = fs.readFileSync(0,'utf8');
+
 //console.log(fileContents);
 let tokens = scan(fileContents)
 
