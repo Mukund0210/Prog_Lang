@@ -12,17 +12,25 @@
 ;;the order, i.e. sum n-units*unit-price over all items
 ;;must be recursive but cannot use loop or recur
  (defn items-total1 [items]
-  (if (empty? items)
-    0
-    (+ (* (:n-units (first items)) (:unit-price (first items))) (items-total1 (rest items)))))
+   (cond
+     (empty? items) 0
+     :else (+ (* (:n-units (first items)) (:unit-price (first items)))
+              (items-total1 (rest items)))))
+
 
 
 ;; #2: 15-points
 ;;given a list items of OrderItem and a category,
 ;;return list of elements of items having specified category.
 ;;must be implemented using recursion
- (defn items-with-category1 [items category]
-  (filter #(= category (:category %)) items))
+(defn items-with-category1 [items category]
+  (if (empty? items)
+    []
+    (let [rest (items-with-category1 (rest items) category)]
+      (if (= category (:category (first items)))
+        (cons (first items) rest)
+        rest))))
+
 
 
 ;; #3: 15-points
@@ -49,15 +57,19 @@
 ;;in items having unit-price greater than price
 ;;cannot use explicit recursion
 (defn expensive-item-skus [items price]
-  (->> items
-       (filter #(> (:unit-price %) price))
-       (map :sku)))
+  (reduce #(if (> (:unit-price %2) price)
+             (conj %1 (:sku %2))
+             %1)
+          []
+          items))
 
 
 ;; #6: 10-points
 ;;same specs as items-total1 but cannot use explicit recursion
  (defn items-total3 [items]
-  (reduce + (map #(:price %) items)))
+   #_{:clj-kondo/ignore [:invalid-arity]}
+   (reduce #(+) (map #(:price %) items)))
+
 
 
 
