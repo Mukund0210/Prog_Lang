@@ -66,9 +66,10 @@
 
 ;; #6: 10-points
 ;;same specs as items-total1 but cannot use explicit recursion
- (defn items-total3 [items]
-   #_{:clj-kondo/ignore [:invalid-arity]}
-   (reduce #(+) (map #(:price %) items)))
+(defn items-total3 [items]
+  (apply + (map #(apply * %) (map #(vector (:n-units %) (:unit-price %)) items))))
+
+
 
 
 

@@ -60,8 +60,8 @@
     (is (= (expensive-item-skus ITEMS 20) (list :ap273)))
     (is (= (expensive-item-skus ITEMS 30) ()))))
 
-;; (deftest test-items-total3
-;;   (test-items-total items-total3))
+(deftest test-items-total3
+  (test-items-total items-total3))
 
 (deftest test-items-with-category2
   (test-items-with-category items-with-category2))
