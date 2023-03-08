@@ -96,6 +96,3 @@
         (filter #(or (nil? category) (= category (:category %))))
         (map :n-units)
         (reduce +))))
-
-
-
