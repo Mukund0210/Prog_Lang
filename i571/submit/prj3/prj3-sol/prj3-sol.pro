@@ -111,11 +111,19 @@ test(all) :-
 % Define items with their categories
 
 items_with_category([], _, []).
+
 items_with_category([order_item(SKU, Category, NUnits, UnitPrice) | Rest], Category, [order_item(SKU, Category, NUnits, UnitPrice) | CategoryRest]) :-
+    Category \= unknown,
     items_with_category(Rest, Category, CategoryRest).
+
 items_with_category([order_item(_, OtherCategory, _, _) | Rest], Category, CategoryRest) :-
     OtherCategory \= Category,
     items_with_category(Rest, Category, CategoryRest).
+
+items_with_category([_ | Rest], Category, CategoryRest) :-
+    Category = unknown,
+    items_with_category(Rest, Category, CategoryRest).
+
 
 :-begin_tests(items_with_category).
 test(cookware, nondet) :-
@@ -140,12 +148,12 @@ test(unknown, nondet) :-
 % expensive_item_skus(Items, Price, ExpensiveSKUs): Match ExpensiveSKUs
 % with the SKUs of those order-items in Items having unit-price > Price.
 
-expensive_item_skus([], _, []).
-expensive_item_skus([order_item(SKU, _, _, UnitPrice) | Rest], Price, [SKU | ExpensiveRest]) :-
-    UnitPrice > Price,
-    expensive_item_skus(Rest, Price, ExpensiveRest).
-expensive_item_skus([_ | Rest], Price, ExpensiveRest) :-
-    expensive_item_skus(Rest, Price, ExpensiveRest).
+expensive_item_skus(Items, Price, ExpensiveSKUs) :-
+    include(expensive_item(Price), Items, ExpensiveItems),
+    findall(SKU, member(order_item(SKU, _, _, _), ExpensiveItems), ExpensiveSKUs).
+
+expensive_item(Price, order_item(_, _, _, UnitPrice)) :-
+    UnitPrice > Price.
 
 
 :-begin_tests(expensive_item_skus).
