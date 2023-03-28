@@ -38,10 +38,12 @@ food_items([Item6]) :-
 % Total with the total for the order, i.e. sum n-units*unit-price over
 % all items.
 % Restriction: must be recursive, but may not define any auxiliary procedures.
+order_item(_, _, _, _).
 items_total1([], 0).
 items_total1([order_item(_, _, Units, Price)|Rest], Total) :-
     items_total1(Rest, RestTotal),
     Total is Units * Price + RestTotal.
+
 
 
 :-begin_tests(items_total1).
@@ -75,11 +77,11 @@ test(all) :-
 % which uses an accumulator.
 % Helper rule for items_total2/3 that uses an accumulator to calculate the total
 items_total2(Items, Total) :- items_total2(Items, 0, Total).
-
 items_total2([], Acc, Acc).
-items_total2([order_item(_, _, Qty, Price)|Rest], Acc, Total) :-
+items_total2([order_item(_, _, Qty, Price)|OtherItems], Acc, Total) :-
     Acc1 is Acc + Qty * Price,
-    items_total2(Rest, Acc1, Total).
+    items_total2(OtherItems, Acc1, Total).
+
 
 
 :-begin_tests(items_total2).
