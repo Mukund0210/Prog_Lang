@@ -1,0 +1,138 @@
+                      P r o j e c t   4
+
+*Due*: Apr 21, before midnight.
+
+*Important Reminder*: As per the course .<../../misc/academic-honesty/academic-honesty-policy.html> "Academic Honesty Policy",
+cheating of any kind will minimally result in your letter grade
+for the entire course being reduced by one level.
+
+This document first provides the aims of this project.  It then lists
+the requirements as explicitly as possible.  It then hints at how
+these requirements can be met.  Finally, it describes how it can be
+submitted.
+
+                        Aims
+                        ====
+
+The aims of this project are as follows:
+
+  + To give you more exposure to recursive programming.
+
+  + To expose you to Haskell programming.
+
+
+			    Requirements
+			    ============
+
+Implement all the functions specified in .<prj4-sol/prj4-sol.hs>
+prj4-sol.hs using the Glasgow Haskell repl `ghci`.
+
+	    		 Provided Files
+			 ==============
+
+You should use the provided .<prj4-sol> prj4-sol directory as a
+starting point for your project by copying it into your `i571?/submit`
+directory.  It contains the following files:
+
+  : .<prj4-sol/prj4-sol.hs?lang=hs> prj4-sol.hs :
+    A skeleton file which contains the specifications for the
+    functions you are required to write.  For each function
+    it contains a dummy implementation with a `"TODO"` error.
+
+  : .<prj4-sol/Unit.hs?lang=hs> Unit.hs :
+    This file provides a crude implementation of assertions
+    for unit tests, without needing to download external
+    dependencies.
+
+  : .<prj4-sol/README> README :
+    A template `README` which you should complete and
+    submit.
+  
+
+			Hints
+			=====
+
+The following points are worth noting:
+
+  + Review the class .<../../slides/haskell/haskell.html> "Haskell
+    slides".
+
+  + Details of specific syntax for different Haskell constructs
+    are available in this .<https://jutge.org/doc/haskell-cheat-sheet.pdf>
+    "Haskell Cheat Sheet".
+
+  + .<https://jstolarek.github.io/files/stolarek_understanding_basic_haskell_error_messages.pdf> "This document" may help you understand Haskell error
+    messages.
+
+  + If you do not understand the specs for a function, please look
+    at the provided tests for examples of the expected use of the function.
+
+  + Minor hints for each function are available in the provided
+    .<prj4-sol/prj4-sol.hs?lang=hs> prj4-sol.hs skeleton file.
+
+  + If you want to experiment with functions or expressions, simply
+    type the expression or function into `ghci`.  For functions,
+    you will need to define the function within a `let`.  You will
+    also need to type the entire definition within a single line
+    using something like:
+
+    .code(lang=hs)
+    ~~~
+    Prelude> let f x = a * x + b where { a = 2; b = 3 }
+    ~~~
+    
+The project can be run from within ghci:
+
+.code(lang=hs)
+~~~
+-- start GHC REPL
+$ ghci
+GHCi, version 8.8.4: https://www.haskell.org/ghc/  :? for help
+
+-- initial load of file
+Prelude> :l "prj4-sol.hs"
+[1 of 2] Compiling Unit             ( Unit.hs, interpreted )
+[2 of 2] Compiling Main             ( prj4-sol.hs, interpreted )
+Ok, two modules loaded.
+
+-- Running all the tests will fail with `"TODO"` exception.
+*Main> testAll
+*** Exception: TODO
+CallStack (from HasCallStack):
+  error, called at prj4-sol.hs:36:21 in main:Main
+~~~
+
+As you develop, you will iterate steps similar to the following:
+
+.code(lang=hs)
+~~~
+-- reload all code; repeat each time source files are changed
+*Main> :r
+Ok, two modules loaded.
+
+-- run specific function
+*Main> categoryItems items "games"
+[]
+
+-- run all tests for specific function deptEmployees
+-- no output means all ok
+*Main> testCategoryItems
+*Main> 
+
+-- run all tests for all functions: no output means all ok
+*Main> testAll
+*Main>
+...
+~~~
+
+
+                        Submission
+                        ==========
+
+Before submitting your project, update your README to specify the
+status of your project.  Document any known issues.
+
+Submit using a procedure similar to that used in your previous project.
+
+
+

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Project  4</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
+  <script type="text/javascript"
+          src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js">
+  </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/github.min.css">
+    <link href="../../assets/styles/article.css" rel="stylesheet" type="text/css" /> 
+</head>
+
+<body class=umt-article>
+    <nav id="course-nav">
+      <ul>
+      </ul>
+    </nav>
+
+    <div class="umt-content">
+      <div><section data-level="h1"><h1>Project  4</h1><p><strong>Due</strong>: Apr 21, before midnight.
+</p><p><strong>Important Reminder</strong>: As per the course  <a href="../../misc/academic-honesty/academic-honesty-policy.html">Academic Honesty Policy</a>,
+cheating of any kind will minimally result in your letter grade
+for the entire course being reduced by one level.
+</p><p>This document first provides the aims of this project.  It then lists
+the requirements as explicitly as possible.  It then hints at how
+these requirements can be met.  Finally, it describes how it can be
+submitted.
+</p><section data-level="h2"><h2>Aims</h2><p>The aims of this project are as follows:
+</p><ul><li><p>To give you more exposure to recursive programming.
+</p></li><li><p>To expose you to Haskell programming.
+</p></li></ul></section><section data-level="h2"><h2>Requirements</h2><p>Implement all the functions specified in 
+<a href="prj4-sol/prj4-sol.hs">prj4-sol.hs</a> using the Glasgow Haskell repl <code>ghci</code>.
+</p></section><section data-level="h2"><h2>Provided Files</h2><p>You should use the provided  <a href="prj4-sol">prj4-sol</a> directory as a
+starting point for your project by copying it into your <code>i571?/submit</code>
+directory.  It contains the following files:
+</p><dl><dt>  <a href="prj4-sol/prj4-sol.hs?lang=hs">prj4-sol.hs</a> </dt><dd><p>    A skeleton file which contains the specifications for the
+    functions you are required to write.  For each function
+    it contains a dummy implementation with a <code>&quot;TODO&quot;</code> error.
+</p></dd><dt>  <a href="prj4-sol/Unit.hs?lang=hs">Unit.hs</a> </dt><dd><p>    This file provides a crude implementation of assertions
+    for unit tests, without needing to download external
+    dependencies.
+</p></dd><dt>  <a href="prj4-sol/README">README</a> </dt><dd><p>    A template <code>README</code> which you should complete and
+    submit.
+</p></dd></dl></section><section data-level="h2"><h2>Hints</h2><p>The following points are worth noting:
+</p><ul><li><p>Review the class  <a href="../../slides/haskell/haskell.html">Haskell
+    slides</a>.
+</p></li><li><p>Details of specific syntax for different Haskell constructs
+    are available in this 
+    <a href="https://jutge.org/doc/haskell-cheat-sheet.pdf">Haskell Cheat Sheet</a>.
+</p></li><li><p> <a href="https://jstolarek.github.io/files/stolarek_understanding_basic_haskell_error_messages.pdf">This document</a> may help you understand Haskell error
+    messages.
+</p></li><li><p>If you do not understand the specs for a function, please look
+    at the provided tests for examples of the expected use of the function.
+</p></li><li><p>Minor hints for each function are available in the provided
+     <a href="prj4-sol/prj4-sol.hs?lang=hs">prj4-sol.hs</a> skeleton file.
+</p></li><li><p>If you want to experiment with functions or expressions, simply
+    type the expression or function into <code>ghci</code>.  For functions,
+    you will need to define the function within a <code>let</code>.  You will
+    also need to type the entire definition within a single line
+    using something like:
+</p><pre class="hljs language-hs">    Prelude> let f x = a * x + b where { a = 2; b = 3 }
+</pre></li></ul><p>The project can be run from within ghci:
+</p><pre class="hljs language-hs">-- start GHC REPL
+$ ghci
+GHCi, version 8.8.4: https://www.haskell.org/ghc/  :? for help
+
+-- initial load of file
+Prelude> :l &quot;prj4-sol.hs&quot;
+[1 of 2] Compiling Unit             ( Unit.hs, interpreted )
+[2 of 2] Compiling Main             ( prj4-sol.hs, interpreted )
+Ok, two modules loaded.
+
+-- Running all the tests will fail with `&quot;TODO&quot;` exception.
+*Main> testAll
+*** Exception: TODO
+CallStack (from HasCallStack):
+  error, called at prj4-sol.hs:36:21 in main:Main
+</pre><p>As you develop, you will iterate steps similar to the following:
+</p><pre class="hljs language-hs">-- reload all code; repeat each time source files are changed
+*Main> :r
+Ok, two modules loaded.
+
+-- run specific function
+*Main> categoryItems items &quot;games&quot;
+[]
+
+-- run all tests for specific function deptEmployees
+-- no output means all ok
+*Main> testCategoryItems
+*Main> 
+
+-- run all tests for all functions: no output means all ok
+*Main> testAll
+*Main>
+...
+</pre></section><section data-level="h2"><h2>Submission</h2><p>Before submitting your project, update your README to specify the
+status of your project.  Document any known issues.
+</p><p>Submit using a procedure similar to that used in your previous project.
+</p></section></section></div>
+    </div>
+
+    <script type="module" src="../../assets/scripts/slide-controls.mjs"></script>
+    <script type="module" src="../../assets/scripts/nav.mjs"></script> 
+    <script type="module" src="../../assets/scripts/highlight.mjs"></script>
+</body>
+</html>
+
