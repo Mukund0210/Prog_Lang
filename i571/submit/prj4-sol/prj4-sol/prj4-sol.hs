@@ -37,10 +37,8 @@ items = [ item1, item2, item3, item4, item5, item6 ]
 -- items which have itemCategory == category.
 -- Restriction: MUST use recursion
 categoryItems :: [OrderItem] -> Category -> [OrderItem]
-categoryItems [] _ = []
-categoryItems (x:xs) category
-  | itemCategory x == category = x : categoryItems xs category
-  | otherwise = categoryItems xs category
+categoryItems items category = filter (\item -> itemCategory item == category) $ map id items
+
 
 
 testCategoryItems = do
@@ -62,7 +60,7 @@ testCategoryItems = do
 -- comprCategoryItems has same spec as categoryItems.
 -- Restriction: MUST be implemented using list comprehension.
 comprCategoryItems :: [OrderItem] -> Category -> [OrderItem]
-comprCategoryItems items category = [x | x <- items, itemCategory x == category]
+comprCategoryItems items category = fst $ partition (\item -> itemCategory item == category) items
 
 testComprCategoryItems = do
   assertEq "comprCategoryItems cookware"
@@ -82,8 +80,8 @@ testComprCategoryItems = do
 -- return the order total for the order containing items
 -- Restriction: May NOT use recursion or list comprehension.
 -- Hint: Use fromIntegral n to convert Int n to Float
-itemsTotal :: [ OrderItem ] -> Float
-itemsTotal items = sum (map (\item -> fromIntegral (itemNUnits item) * itemUnitPrice item) items)
+itemsTotal :: [OrderItem] -> Float
+itemsTotal items = sum [(fromIntegral (itemNUnits item) * itemUnitPrice item) | item <- items]
 
 testItemsTotal = do
   assertEq "itemsTotal all"
@@ -105,7 +103,9 @@ testItemsTotal = do
 -- Restriction: May NOT use recursion or list comprehension
 -- Hint: [1..n] generates a list of the integers from 1 to n
 factorial :: Integer -> Integer
-factorial n = foldl (*) 1 [1..n]
+factorial n = go n 1
+  where go 0 acc = acc
+        go n acc = go (n-1) (n*acc)
 
 testFactorial = do
   assertEq "factorial 0" (factorial 0) 1
@@ -122,7 +122,8 @@ testFactorial = do
 -- Hint: Use earlier factorial function
 
 factNums :: [Integer]
-factNums = scanl (*) 1 [1..]
+factNums = go 1 1
+  where go n acc = acc : go (n + 1) (acc * n)
 
 testFactNums = do
   assertEq "factNums first 6" (take 6 factNums) [1, 1, 2, 6, 24, 120]
@@ -146,8 +147,9 @@ type AssocList a b = [(a, b)]
 -- Hint: recurse through assocList testing each pair against key
 
 assoc :: Eq a => a -> AssocList a b -> Maybe b
-assoc _ [] = Nothing
-assoc key ((k, v):xs) = if key == k then Just v else assoc key xs
+assoc key xs = case [v | (k, v) <- xs, k == key] of
+                 [] -> Nothing
+                 (v:_) -> Just v
 
 
 testAssoc = do
@@ -186,8 +188,16 @@ type Binding = (VarName, Term)
 -- of each binding.
 -- Hint: use sortBy and compare
 sortBindings :: [Binding] -> [Binding]
-sortBindings = sortBy (compare `on` fst)
-  where on f g x y = f (g x) (g y)
+sortBindings [] = []
+sortBindings [x] = [x]
+sortBindings xs = merge (sortBindings left) (sortBindings right)
+  where (left, right) = splitAt (length xs `div` 2) xs
+        merge [] ys = ys
+        merge xs [] = xs
+        merge (x:xs) (y:ys)
+          | fst x <= fst y = x : merge xs (y:ys)
+          | otherwise = y : merge (x:xs) ys
+
 
 testSortBindings = do
   assertEq "empty" (sortBindings []) []
@@ -301,26 +311,30 @@ testNormalizeBindings =
 --        also prove useful.  Make sure your definition covers all
 --        possible cases for the two lists.
 --        Again, use case expressions to handle Maybe results.
-type Binding = (String, Term)
+
+type Bindings = [(VarName, Term)]
 
 unify :: Term -> Term -> Maybe [Binding]
 unify t1 t2 = unify' t1 t2 []
 
-unify' :: Term -> Term -> [Binding] -> Maybe [Binding]
-unify' (Var x) t b = case lookup x b of
-  Just t' -> unify' t' t b
-  Nothing -> Just ((x, t) : b)
-unify' t (Var x) b = unify' (Var x) t b
-unify' (Struct n1 ts1) (Struct n2 ts2) b
+unify' :: Term -> Term -> Bindings -> Maybe [Binding]
+unify' (Var v1) (Var v2) bs
+  | v1 == v2 = Just bs
+  | otherwise = Just $ normalizeBindings ((v1, Var v2):bs)
+unify' (Var v) t bs = Just $ normalizeBindings ((v, t):bs)
+unify' t (Var v) bs = Just $ normalizeBindings ((v, t):bs)
+unify' (Struct n1 ts1) (Struct n2 ts2) bs
   | n1 /= n2 || length ts1 /= length ts2 = Nothing
-  | otherwise = unifyList ts1 ts2 b
+  | otherwise = unifyList ts1 ts2 bs
 
-unifyList :: [Term] -> [Term] -> [Binding] -> Maybe [Binding]
-unifyList [] [] b = Just b
-unifyList (t1 : ts1) (t2 : ts2) b = case unify' t1 t2 b of
-  Just b' -> unifyList ts1 ts2 b'
-  Nothing -> Nothing
-unifyList _ _ _ = Nothing
+unifyList :: [Term] -> [Term] -> Bindings -> Maybe [Binding]
+unifyList [] [] bs = Just bs
+unifyList (t1:ts1) (t2:ts2) bs =
+  case unify' (substTerm t1 bs) (substTerm t2 bs) bs of
+    Nothing -> Nothing
+    Just bs' -> unifyList ts1 ts2 bs'
+unifyList _ _ _ = Nothing
+
 
 testUnify = do
   assertEq "unify: X = Y => [(X, Y)]"
