@@ -277,10 +277,11 @@ testSubstTerm =
 -- (normalizeBindings binding) returns sorted bindings with each
 -- term in bindings replaced by (substTerm term bindings).
 normalizeBindings :: [Binding] -> [Binding]
-normalizeBindings bindings = sortBy cmp (map f bindings)
+normalizeBindings bindings = sortBy cmp (map f (foldl addTerm [] bindings))
   where
     cmp (x, _) (y, _) = compare x y
-    f (var, term) = (var, substTerm term bindings)
+    addTerm acc (var, term) = (var, substTerm term bindings) : acc
+    f (var, term) = (var, term)
 
 
 testNormalizeBindings =   
@@ -329,10 +330,9 @@ unify' (Struct n1 ts1) (Struct n2 ts2) bs
 
 unifyList :: [Term] -> [Term] -> Bindings -> Maybe [Binding]
 unifyList [] [] bs = Just bs
-unifyList (t1:ts1) (t2:ts2) bs =
-  case unify' (substTerm t1 bs) (substTerm t2 bs) bs of
-    Nothing -> Nothing
-    Just bs' -> unifyList ts1 ts2 bs'
+unifyList (t1:ts1) (t2:ts2) bs = do
+  bs' <- unify' (substTerm t1 bs) (substTerm t2 bs) bs
+  unifyList ts1 ts2 bs'
 unifyList _ _ _ = Nothing
 
 
